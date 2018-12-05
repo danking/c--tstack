@@ -1,14 +1,16 @@
 #include <vector>
 #include <memory>
 #include <cassert>
+#include <stdint.h>
 
+template<typename Value>
 class Transaction {
-  size_t constexpr static INVALID_INDEX = ((size_t)0)-1;
+  size_t constexpr static INVALID_INDEX = SIZE_MAX;
 public:
   std::shared_ptr<Transaction> tprev {};
   std::shared_ptr<Transaction> prev {};
   size_t prev_index {};
-  std::vector<int> data {};
+  std::vector<Value> data {};
   Transaction() = default;
   explicit Transaction(std::shared_ptr<Transaction> prev)
     :tprev{std::move(prev)} {
@@ -23,53 +25,54 @@ public:
     this->prev = t;
     this->prev_index = t == nullptr ? INVALID_INDEX : t->data.size()-1;
   }
-  void push(int i) {
+  void push(Value i) {
     data.push_back(i);
   }
-  int top() {
+  Value top() {
     if (data.size() == 0) {
       assert(prev != nullptr);
       assert(prev_index != INVALID_INDEX);
       return prev->data[prev_index];
     } else {
-      int x = data.back();
+      Value x = data.back();
       return x;
     }
   }
-  int pop() {
+  Value pop() {
     if (data.size() == 0) {
       assert(prev != nullptr);
       assert(prev_index != INVALID_INDEX);
       if (prev_index == 0) {
-        int top = prev->data[prev_index];
+        Value top = prev->data[prev_index];
         init_prev(prev->prev);
         return top;
       } else {
         return prev->data[prev_index--];
       }
     } else {
-      int x = data.back();
+      Value x = data.back();
       data.pop_back();
       return x;
     }
   }
 };
 
+template<typename Value>
 class TStack {
-  std::shared_ptr<Transaction> t;
+  std::shared_ptr<Transaction<Value>> t;
 public:
-  TStack() :t{std::make_shared<Transaction>()} {}
-  void push(int i) {
+  TStack() :t{std::make_shared<Transaction<Value>>()} {}
+  void push(Value i) {
     t->push(i);
   }
-  int top() {
+  Value top() {
     return t->top();
   }
-  int pop() {
+  Value pop() {
     return t->pop();
   }
   void begin() {
-    t = std::make_shared<Transaction>(t);
+    t = std::make_shared<Transaction<Value>>(t);
   }
   void commit() {
     t->tprev = t->tprev->tprev;

@@ -1,8 +1,8 @@
 #include <iostream>
 #include "tstack.h"
 
-int main(int argc, char** argv) {
-  TStack t = {};
+int main() {
+  TStack<int> t = {};
   t.push(1);
   assert(t.top() == 1);
   t.push(2);
@@ -88,5 +88,7 @@ int main(int argc, char** argv) {
   assert(t.top() == 3);
   t.rollback();
   assert(t.top() == 2);
+
+  printf("all tests passed");
   return 0;
 }
