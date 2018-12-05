@@ -89,6 +89,6 @@ int main() {
   t.rollback();
   assert(t.top() == 2);
 
-  printf("all tests passed");
+  printf("all tests passed\n");
   return 0;
 }
