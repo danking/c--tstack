@@ -7,21 +7,21 @@ template<typename Value>
 class Transaction {
   size_t constexpr static INVALID_INDEX = SIZE_MAX;
 public:
-  std::shared_ptr<Transaction> tprev {};
-  std::shared_ptr<Transaction> prev {};
+  std::unique_ptr<Transaction> tprev {};
+  Transaction* prev {};
   size_t prev_index {};
   std::vector<Value> data {};
   Transaction() = default;
-  explicit Transaction(std::shared_ptr<Transaction> t)
+  explicit Transaction(std::unique_ptr<Transaction> t)
     :tprev{std::move(t)} {
       if (tprev->data.size() == 0) {
         this->prev = tprev->prev;
         this->prev_index = tprev->prev_index;
       } else {
-        init_prev(tprev);
+        init_prev(tprev.get());
       }
     }
-  void init_prev(std::shared_ptr<Transaction> t) {
+  void init_prev(Transaction* t) {
     this->prev = t;
     this->prev_index = t == nullptr ? INVALID_INDEX : t->data.size()-1;
   }
@@ -59,9 +59,9 @@ public:
 
 template<typename Value>
 class TStack {
-  std::shared_ptr<Transaction<Value>> t;
+  std::unique_ptr<Transaction<Value>> t;
 public:
-  TStack() :t{std::make_shared<Transaction<Value>>()} {}
+  TStack() :t{std::make_unique<Transaction<Value>>()} {}
   void push(Value i) {
     t->push(i);
   }
@@ -72,12 +72,12 @@ public:
     return t->pop();
   }
   void begin() {
-    t = std::make_shared<Transaction<Value>>(t);
+    t = std::make_unique<Transaction<Value>>(std::move(t));
   }
   void commit() {
-    t->tprev = t->tprev->tprev;
+    t->tprev = std::move(t->tprev->tprev);
   }
   void rollback() {
-    t = t->tprev;
+    t = std::move(t->tprev);
   }
 };
