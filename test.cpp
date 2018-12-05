@@ -89,6 +89,15 @@ int main() {
   t.rollback();
   assert(t.top() == 2);
 
+  t = {};
+  t.begin();
+  t.push(1);
+  t.begin();
+  t.push(2);
+  t.commit();
+  assert(t.pop() == 2);
+  assert(t.pop() == 1);
+
   printf("all tests passed\n");
   return 0;
 }
