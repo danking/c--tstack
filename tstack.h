@@ -12,8 +12,8 @@ public:
   size_t prev_index {};
   std::vector<Value> data {};
   Transaction() = default;
-  explicit Transaction(std::shared_ptr<Transaction> prev)
-    :tprev{std::move(prev)} {
+  explicit Transaction(std::shared_ptr<Transaction> t)
+    :tprev{std::move(t)} {
       if (tprev->data.size() == 0) {
         this->prev = tprev->prev;
         this->prev_index = tprev->prev_index;
