@@ -5,21 +5,21 @@
 class Transaction {
   size_t constexpr static INVALID_INDEX = ((size_t)0)-1;
 public:
-  std::shared_ptr<Transaction> tprev;
-  std::shared_ptr<Transaction> prev;
-  size_t prev_index;
-  std::vector<int> data;
-  Transaction() :tprev{nullptr}, prev{nullptr}, prev_index{0}, data{} {}
+  std::shared_ptr<Transaction> tprev {};
+  std::shared_ptr<Transaction> prev {};
+  size_t prev_index {};
+  std::vector<int> data {};
+  Transaction() = default;
   explicit Transaction(std::shared_ptr<Transaction> prev)
-    :tprev{prev}, prev{}, prev_index{}, data{} {
-      if (prev->data.size() == 0) {
-        this->prev = prev->prev;
-        this->prev_index = prev->prev_index;
+    :tprev{std::move(prev)} {
+      if (tprev->data.size() == 0) {
+        this->prev = tprev->prev;
+        this->prev_index = tprev->prev_index;
       } else {
-        init_prev(prev);
+        init_prev(tprev);
       }
     }
-  void init_prev(const std::shared_ptr<Transaction>& t) {
+  void init_prev(std::shared_ptr<Transaction> t) {
     this->prev = t;
     this->prev_index = t == nullptr ? INVALID_INDEX : t->data.size()-1;
   }
