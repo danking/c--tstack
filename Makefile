@@ -1,4 +1,6 @@
-.PHONY: clean
+.PHONY: clean default
+
+default: build/test
 
 CXXFLAGS += -std=c++2a -ggdb
 WARNING += -pedantic -Wall -Wextra -Werror -Wcast-align -Wcast-qual							\
